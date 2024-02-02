@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const { sentiment } = require("./modules/sentiment");
+const dotenv = require('dotenv');
+dotenv.config();
 
 
 const app = express();
@@ -13,22 +15,19 @@ app.use(
   })
 );
 
-// app.use(
-//   cors({
-//     origin: "*", 
-//   })
-// );
-
 app.listen(4000, () => console.log("App is running http://localhost:4000"));
 
+app.post("/api/sentiment", async (req, res) => {
+  try {
+    const data = req.body.data;
+    console.log(data);
 
-app.post("/api/sentiment", (req, res) => {
-  console.log(req)
-  const data = req.body.data;
+    const calculatedsentiment = await sentiment(data);
+    console.log(calculatedsentiment);
 
-  const calculatedsentiment = sentiment(data);
-
-  return res.send({ calculatedsentiment });
+    return res.send({ calculatedsentiment });
+  } catch (error) {
+    console.error("Error processing sentiment:", error.message);
+    return res.status(500).send({ error: "Internal Server Error" });
+  }
 });
-
-
